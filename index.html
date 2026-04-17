@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RAG Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      border-radius: 8px;
+      border: none;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
+    }
+
+    .output {
+      background: #020617;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .step {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>RAG Simulator</h1>
+
+    <div class="card">
+      <h3>1. Add Documents (Knowledge Base)</h3>
+      <textarea id="docs" placeholder="Paste multiple documents here..."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>2. Ask a Question</h3>
+      <input id="query" placeholder="Ask something..." />
+      <button onclick="runRAG()">Run RAG</button>
+    </div>
+
+    <div class="card">
+      <h3>3. Retrieval Step</h3>
+      <div id="retrieval" class="output"></div>
+    </div>
+
+    <div class="card">
+      <h3>4. Augmented Prompt</h3>
+      <div id="augmented" class="output"></div>
+    </div>
+
+    <div class="card">
+      <h3>5. Final Answer (Simulated LLM)</h3>
+      <div id="answer" class="output"></div>
+    </div>
+  </div>
+
+  <script>
+    function runRAG() {
+      const docs = document.getElementById("docs").value.split("\n");
+      const query = document.getElementById("query").value.toLowerCase();
+
+      let retrieved = [];
+
+      docs.forEach(doc => {
+        if (doc.toLowerCase().includes(query)) {
+          retrieved.push(doc);
+        }
+      });
+
+      if (retrieved.length === 0) {
+        retrieved.push("No exact match found. Showing closest info...");
+        retrieved.push(...docs.slice(0,2));
+      }
+
+      document.getElementById("retrieval").innerText = retrieved.join("\n\n");
+
+      const augmentedPrompt = `Question: ${query}\n\nContext:\n${retrieved.join("\n")}`;
+      document.getElementById("augmented").innerText = augmentedPrompt;
+
+      const answer = generateAnswer(query, retrieved);
+      document.getElementById("answer").innerText = answer;
+    }
+
+    function generateAnswer(query, context) {
+      return "Based on retrieved documents: \n\n" + context.join("\n") + "\n\nThis is your simulated AI answer.";
+    }
+  </script>
+</body>
+</html>
